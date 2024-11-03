@@ -1,0 +1,120 @@
+.Reqs {
+    font-family: 'Georgia', serif; /* Fuente más elegante */
+}
+
+header {
+    background-color: #4a90e2; /* Color de fondo elegante */
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #3a78c2;
+}
+
+header h1 {
+    font-size: 2.5em; /* Título grande */
+    color: white;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    height: calc(100vh - 70px); /* Ajustar altura según el tamaño del encabezado */
+}
+
+.menu {
+    width: 20%;
+    background-color: #f1f1f1;
+    padding: 15px;
+    border-right: 2px solid #dee2e6;
+    overflow-y: auto;
+}
+
+.menu button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: none;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 1.1em;
+    cursor: pointer;
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s ease;
+}
+
+.menu button:hover {
+    background-color: #3a78c2;
+}
+
+.submenu button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: none;
+    background-color: #6fa3ef;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s ease;
+}
+
+.submenu button:hover {
+    background-color: #5a8ed6;
+}
+
+.panel {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    overflow-y: auto;
+}
+
+.panel h2 {
+    font-size: 2em;
+    color: #333;
+}
+
+.panel form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrar los inputs */
+}
+
+.panel input[type="text"] {
+    width: 80%; /* Reducir el ancho de los inputs */
+    max-width: 500px; /* Ancho máximo */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.panel button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.panel button[type="submit"]:hover {
+    background-color: #3a78c2;
+}
+
+.result {
+    margin-top: 20px;
+    white-space: pre-wrap; /* Mantener el formato de los resultados */
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    font-family: 'Courier New', Courier, monospace; /* Fuente más legible para la impresión */
+    font-size: 1em; /* Tamaño de letra más legible */
+}
