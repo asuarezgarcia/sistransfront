@@ -57,23 +57,19 @@ function Reqs() {
                     });
                     break;
                 case 2: // RF3 Crear o Borrar Bodega
-                if (selectedSubMenu === 0) { // Crear Bodega
-                    const tamanio = parseInt(inputData[1]);
-                    if (isNaN(tamanio) || tamanio <= 0) {
-                        setResult('Error: El tamaño debe ser un número mayor que 0');
-                        return;
+                    if (selectedSubMenu === 0) { // Crear Bodega
+                        response = await axios.post('http://localhost:8080/superandes/bodegas/new/save', {
+                            nombre: inputData[0],
+                            tamanio: inputData[1],
+                            idsucursal: {
+                                idSucursal: parseInt(inputData[2])
+                            }
+                        })
+                        ;
+                    } else if (selectedSubMenu === 1) { // Borrar Bodega
+                        response = await axios.delete(`http://localhost:8080/superandes/bodegas/${inputData[0]}/delete`);
                     }
-                    response = await axios.post('http://localhost:8080/superandes/bodegas/new/save', {
-                        nombre: inputData[0],
-                        tamano: tamanio,
-                        idsucursal: {
-                            idSucursal: parseInt(inputData[2])
-                        }
-                    });
-                } else if (selectedSubMenu === 1) { // Borrar Bodega
-                    response = await axios.delete(`http://localhost:8080/superandes/bodegas/${inputData[0]}/delete`);
-                }
-                break;
+                    break;
                 case 3: // RF4 Crear proveedor y actualizarlo
                 if (selectedSubMenu === 0) { // Crear proveedor
                     response = await axios.post('http://localhost:8080/superandes/proveedores/new/save', {
@@ -254,22 +250,21 @@ function Reqs() {
                         <input type="text" value={inputData[3] || ''} onChange={(e) => handleInputChange(e, 3)} placeholder="ID ciudad asociada" />
                     </>
                 );
-            case 2: // RF3 Crear Bodega y borrarla
-                if (selectedSubMenu === 0){
+            case 2: // RF3 Crear o Borrar Bodega
+                if (selectedSubMenu === 0) { // Crear Bodega
                     return (
                         <>
-                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Nombre bodega" />
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Nombre Bodega" />
                             <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Tamanio" />
-                            <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="ID sucursal" />
+                            <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="ID Sucursal" />
                         </>
                     );
-                }
-                else if (selectedSubMenu === 1){
+                } else if (selectedSubMenu === 1) { // Borrar Bodega
                     return (
                         <>
-                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="ID bodega" />
-                         </>
-                        );
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="ID Bodega" />
+                        </>
+                    );
                 }
                 break;
             case 3: // RF4 Crear proveedor y actualizarlo
