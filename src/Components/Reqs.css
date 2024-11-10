@@ -118,3 +118,51 @@ header h1 {
     font-family: 'Courier New', Courier, monospace; /* Fuente más legible para la impresión */
     font-size: 1em; /* Tamaño de letra más legible */
 }
+
+/* Estilo para el botón de agregar producto */
+button.add-product {
+    display: block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    margin-bottom: 20px; /* Agrega margen inferior */
+    border: none;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s ease;
+}
+
+button.add-product:hover {
+    background-color: #3a78c2; /* Color de fondo al pasar el ratón */
+}
+
+/* Estilo para el botón de agregar lista de productos */
+button.add-product-list {
+    display: block;
+    padding: 10px 20px;
+    margin-bottom: 20px; /* Agrega margen superior */
+    border: none;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s ease;
+}
+
+button.add-product-list:hover {
+    background-color: #3a78c2; /* Color de fondo al pasar el ratón */
+}
+
+/* Asegurar que los inputs de productos tengan la misma distancia */
+.product-inputs {
+    width: 80%; /* Reducir el ancho de los inputs */
+    max-width: 500px; /* Ancho máximo */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}

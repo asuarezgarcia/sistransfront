@@ -29,12 +29,30 @@ function Reqs() {
         });
     };
 
-    /*
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        // Perform some operation with inputData and set the result
-        setResult(`Result for button ${selectedButton}: ${JSON.stringify(inputData)}`);
-    };*/
+    // Esto es para manejar los inputs del req 7
+    const [products, setProducts] = useState([]);
+    const [productInput, setProductInput] = useState({});
+    const handleProductInputChange = (e, attribute) => { // Maneja los inputs de productos
+        setProductInput({
+            ...productInput,
+            [attribute]: isNaN(e.target.value) ? e.target.value : parseInt(e.target.value)
+        });
+    };
+
+    const handleAddProduct = () => {
+        setProducts([...products, productInput]); // Agrega el producto a la lista de productos y la limpia
+        setProductInput({});
+    };
+
+    const handleSubmit = () => { // Agrega la lista de productos a la lista de inputs
+        setInputData({
+            ...inputData,
+            4: products
+        });
+
+        setProducts([]);
+        setProductInput({});
+    }
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -140,13 +158,16 @@ function Reqs() {
                 }
                 break;
                 case 6: // RF7 Crear Orden para una sucursal
+                    console.log(inputData[4]);
+                    console.log(inputData[2]);
                     response = await axios.post('http://localhost:8080/superandes/ordenes/new/save', {
                         fechaEntrega: inputData[0],
                         estado: inputData[1],
-                        idSucursalEnvio: parseInt(inputData[2]),
-                        nitProveedor: parseInt(inputData[3]),
-                        productos: inputData[4]
+                        sucursalEnvio: parseInt(inputData[2]),
+                        proveedor: parseInt(inputData[3]),
+                        productosExtra: inputData[4]
                     });
+                    setResult("Mensaje personalizado");
                     break;
                 case 7: // RF8 Anular orden
                     response = await axios.put(`http://localhost:8080/superandes/ordenes/${inputData[0]}/update`, {
@@ -222,7 +243,12 @@ function Reqs() {
                 default:
                     return null;
             }
+            if (selectedButton !== 6){
             setResult(JSON.stringify(response.data, null, 2));
+            }
+            else {
+                setResult(response.data);
+            }
         } catch (error) {
             console.error('Error:', error);
             if (error.response && error.response.data) {
@@ -363,10 +389,26 @@ function Reqs() {
                 return (
                     <>
                         <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Fecha entrega (YYYY-MM-DD)" />
-                        <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Estado: Poner Vigente" />
+                        <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Estado: Poner vigente" />
                         <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="ID sucursal envío" />
-                        <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="NIT proveedor" />
-                        <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Falta lógica productos" />
+                        <input type="text" value={inputData[3] || ''} onChange={(e) => handleInputChange(e, 3)} placeholder="NIT proveedor" />
+            
+                        <div className="product-inputs">
+                            <input type="text" value={productInput.codBarras || ''} onChange={(e) => handleProductInputChange(e, 'codBarras')} placeholder="Producto Código de barras" />
+                            <input type="text" value={productInput.cantidad || ''} onChange={(e) => handleProductInputChange(e, 'cantidad')} placeholder="Producto Cantidad" />
+                            <input type="text" value={productInput.precioBodega || ''} onChange={(e) => handleProductInputChange(e, 'precioBodega')} placeholder="Producto Precio en bodega" />
+                            <button type="button" className="add-product" onClick={handleAddProduct}>Agregar Producto a la lista</button>
+                        </div>
+            
+                        <ul>
+                            {products.map((product, index) => (
+                                <li key={index}>
+                                    {product.codBarras}, {product.cantidad}, {product.precioBodega}
+                                </li>
+                            ))}
+                        </ul>
+            
+                        <button type="button" className="add-product-list" onClick={handleSubmit}>Agregar lista de productos</button>
                     </>
                 );
             case 7: // RF8 Anular orden
