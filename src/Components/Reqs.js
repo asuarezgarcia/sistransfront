@@ -3,6 +3,609 @@ import axios from "axios";
 import './Reqs.css';
 
 function Reqs() {
+    // Estos son para el manejo de los componentes de la interfaz
+    const [selectedButton, setSelectedButton] = useState(null);
+    const [selectedSubMenu, setSelectedSubMenu] = useState(null);
+    const [inputData, setInputData] = useState({});
+    const [result, setResult] = useState('');
+
+
+    const handleButtonClick = (buttonIndex) => {
+        setSelectedButton(buttonIndex);
+        setSelectedSubMenu(null); // Reset sub menu when a new button is selected
+        setInputData({});
+        setResult('');
+    };
+
+    const handleSubMenuClick = (subMenuIndex) => {
+        setSelectedSubMenu(subMenuIndex);
+        setInputData({});
+        setResult('');
+    };
+    
+    const handleInputChange = (e, inputIndex) => {
+        setInputData({
+            ...inputData,
+            [inputIndex]: e.target.value
+        });
+    };
+
+    // Esto último es para manejar los inputs del req 6
+    const [products, setProducts] = useState([]);
+    const [productInput, setProductInput] = useState({});
+    const handleProductInputChange = (e, attribute) => { // Maneja los inputs de productos
+        setProductInput({
+            ...productInput,
+            [attribute]: isNaN(e.target.value) ? e.target.value : parseInt(e.target.value)
+        });
+    };
+
+    const handleAddProduct = () => {
+        setProducts([...products, productInput]); // Agrega el producto a la lista de productos y la limpia
+        setProductInput({});
+    };
+
+    const handleSubmit = () => { // Agrega la lista de productos a la lista de inputs
+        setInputData({
+            ...inputData,
+            4: products
+        });
+
+        setProducts([]);
+        setProductInput({});
+    }
+
+
+    // Esto es para manejar los submit de los forms; lo que llama al back
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            let response;
+            switch (selectedButton) {
+                case 0: // RF1 Crear Sucursal
+                    response = await axios.post('http://localhost:8080/superandes/sucursales/new/save', {
+                        nombre: inputData[0],
+                        direccion: inputData[1],
+                        telefono: inputData[2],
+                        ciudad_Asociada: {
+                            idCiudad: parseInt(inputData[3])
+                        }
+                    });
+                    break;
+                case 1: // RF2 Crear o Borrar Bodega
+                    if (selectedSubMenu === 0) { // Crear Bodega
+                        response = await axios.post('http://localhost:8080/superandes/bodegas/new/save', {
+                            nombre: inputData[0],
+                            tamanio: inputData[1],
+                            idsucursal: {
+                                idSucursal: parseInt(inputData[2])
+                            }
+                        })
+                        ;
+                    } else if (selectedSubMenu === 1) { // Borrar Bodega
+                        response = await axios.delete(`http://localhost:8080/superandes/bodegas/${inputData[0]}/${inputData[1]}/delete`);
+                    }
+                    break;
+                case 2: // RF3 Crear proveedor y actualizarlo
+                if (selectedSubMenu === 0) { // Crear proveedor
+                    response = await axios.post('http://localhost:8080/superandes/proveedores/new/save', {
+                        nit: parseInt(inputData[0]),
+                        nombre: inputData[1],
+                        direccion: inputData[2],
+                        nombreContacto: inputData[3],
+                        telefonoContacto: inputData[4]
+                    });
+                }
+                else if (selectedSubMenu === 1) { // Actualizar proveedor
+                    response = await axios.post(`http://localhost:8080/superandes/proveedores/${inputData[0]}/edit/save`, {
+                        nit: inputData[0],
+                        nombre: inputData[1],
+                        direccion: inputData[2],
+                        nombreContacto: inputData[3],
+                        telefonoContacto: inputData[4]
+                    });
+                }
+                break;
+                case 3: // RF4 Crear categoría y leer
+                if (selectedSubMenu === 0) { // Crear categoría
+                    response = await axios.post('http://localhost:8080/superandes/categorias/new/save', {
+                        nombre: inputData[0],
+                        descripcion: inputData[1],
+                        caracteristicas: inputData[2]
+                    });
+                }
+                else if (selectedSubMenu === 1) { // Leer por ID
+                    response = await axios.get(`http://localhost:8080/superandes/categorias/id/${inputData[0]}`);
+                }
+                else if (selectedSubMenu === 2) { // Leer por nombre
+                    response = await axios.get(`http://localhost:8080/superandes/categorias/nombre/${inputData[0]}`);
+                }
+                break;
+                case 4: // RF5 Crear, leer (código o nombre) y actualizar un producto
+                if (selectedSubMenu === 0) { // Crear
+                    response = await axios.post('http://localhost:8080/superandes/productos/new/save', {
+                        nombre: inputData[0],
+                        precioVenta: parseInt(inputData[1]),
+                        presentacion: inputData[2],
+                        unidadMedida: inputData[3],
+                        espEmpacado: inputData[4],
+                        fechaExp: inputData[5],
+                        categoria: {
+                            codigo: parseInt(inputData[6])
+                        }
+                    });
+                }
+                else if (selectedSubMenu === 1) { // Leer por ID
+                    response = await axios.get(`http://localhost:8080/superandes/productos/id/${inputData[0]}`);
+                }
+                else if (selectedSubMenu === 2) { // Leer por nombre
+                    response = await axios.get(`http://localhost:8080/superandes/productos/nombre/${inputData[0]}`);
+                }
+                else if (selectedSubMenu === 3) { // Actualizar
+                    response = await axios.put(`http://localhost:8080/superandes/productos/${inputData[7]}/edit/save`, {
+                        nombre: inputData[0],
+                        precioVenta: inputData[1],
+                        presentacion: inputData[2],
+                        unidadMedida: inputData[3],
+                        empacado: inputData[4],
+                        fechaExp: inputData[5],
+                        idCategoria: {
+                            idCategoria: inputData[6]
+                        }
+                    });
+                }
+                break;
+                case 5: // RF6 Crear Orden para una sucursal
+                    console.log(inputData[4]);
+                    console.log(inputData[2]);
+                    response = await axios.post('http://localhost:8080/superandes/ordenes/new/save', {
+                        fechaEntrega: inputData[0],
+                        estado: inputData[1],
+                        sucursalEnvio: parseInt(inputData[2]),
+                        proveedor: parseInt(inputData[3]),
+                        productosExtra: inputData[4]
+                    });
+                    setResult("Mensaje personalizado");
+                    break;
+                case 6: // RF7 Leer orden por id
+                    response = await axios.get(`http://localhost:8080/superandes/ordenes/${inputData[0]}`);
+                    break;
+                case 7: // RFC1 Ver productos que cumplen cierta característica
+                    let params = [];
+                    if (selectedSubMenu === 0) { // Sucursal
+                        params = ["sucursal", parseInt(inputData[0])];
+                    } else if (selectedSubMenu === 1) { // Precio
+                        params = ["precio", inputData[0], inputData[1]];
+                    } else if (selectedSubMenu === 2) { // Fechas
+                        params = ["fecha", inputData[0], inputData[1]];
+                    } else if (selectedSubMenu === 3) { // Categoría
+                        params = ["categoria", inputData[0]];
+                    }
+                    response = await axios.post('http://localhost:8080/superandes/productos/RFC1', params, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    setResult(response.data);
+                    break;
+                case 8: // RFC2 Inventario productos en una sucursal
+                    response = await axios.get(`http://localhost:8080/superandes/sucursales/RFC2/${inputData[0]}`);
+                    break;
+
+                default:
+                    return null;
+            }
+            if (selectedButton === 4|6){
+            setResult(JSON.stringify(response.data, null, 2));
+            }
+            else {
+                setResult(response.data);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            if (error.response && error.response.data) {
+                setResult(`Error: ${JSON.stringify(error.response.data, null, 2)}`);
+            } else {
+                setResult('Error :(');
+            }
+        }
+    };
+
+    // Este pone los botones de los requerimientos
+    const renderInputs = () => {
+        switch (selectedButton) {
+            case 0: // RF1 Crear Sucursal
+                return (
+                    <>
+                        <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Nombre Sucursal" />
+                        <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Dirección" />
+                        <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="Teléfono" />
+                        <input type="text" value={inputData[3] || ''} onChange={(e) => handleInputChange(e, 3)} placeholder="ID ciudad asociada" />
+                    </>
+                );
+            case 1: // RF2 Crear o Borrar Bodega
+                if (selectedSubMenu === 0) { // Crear Bodega
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Nombre Bodega" />
+                            <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Tamanio" />
+                            <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="ID Sucursal" />
+                        </>
+                    );
+                } else if (selectedSubMenu === 1) { // Borrar Bodega
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="ID Sucursal" />
+                            <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="ID Bodega" />
+                        </>
+                    );
+                }
+                break;
+            case 2: // RF3 Crear proveedor y actualizarlo
+                if (selectedSubMenu === 0){
+                    return (
+                        <>
+                        <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="NIT proveedor" />
+                        <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Nombre " />
+                        <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="Dirección" />
+                        <input type="text" value={inputData[3] || ''} onChange={(e) => handleInputChange(e, 3)} placeholder="Nombre contacto" />
+                        <input type="text" value={inputData[4] || ''} onChange={(e) => handleInputChange(e, 4)} placeholder="Teléfono contacto" />
+                        </>
+                    );
+                }
+                else if (selectedSubMenu === 1){
+                    return (
+                        <>
+                        <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="NIT proveedor" />
+                        <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Nombre " />
+                        <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="Dirección" />
+                        <input type="text" value={inputData[3] || ''} onChange={(e) => handleInputChange(e, 3)} placeholder="Nombre contacto" />
+                        <input type="text" value={inputData[4] || ''} onChange={(e) => handleInputChange(e, 4)} placeholder="Teléfono contacto" />
+                        </>
+                        );
+                }
+                break;
+            case 3: // RF4 Crear categoría y leer
+                if (selectedSubMenu === 0) {
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Nombre" />
+                            <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Descripción " />
+                            <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="Características" />
+                        </>
+                    );
+                }
+                else if (selectedSubMenu === 1) {
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="ID" />
+                        </>
+                    );
+                }
+                else if (selectedSubMenu === 2) {
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Nombre" />
+                        </>
+                    );
+                }
+                break;                    
+            case 4: // RF5 Crear, leer (código o nombre) y actualizar un producto
+                if (selectedSubMenu === 0) { // Crear
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Nombre" />
+                            <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Precio Venta " />
+                            <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="Presentación" />
+                            <input type="text" value={inputData[3] || ''} onChange={(e) => handleInputChange(e, 3)} placeholder="Unidad Medida" />
+                            <input type="text" value={inputData[4] || ''} onChange={(e) => handleInputChange(e, 4)} placeholder="Empacado" />
+                            <input type="text" value={inputData[5] || ''} onChange={(e) => handleInputChange(e, 5)} placeholder="Fecha Exp (YYYY-MM-DD)" />
+                            <input type="text" value={inputData[6] || ''} onChange={(e) => handleInputChange(e, 6)} placeholder="ID categoría" />
+                        </>
+                    );
+                }
+                else if (selectedSubMenu === 1) { // Leer por ID
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="ID" />
+                        </>
+                    );
+                }
+                else if (selectedSubMenu === 2) { // Leer por nombre
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Nombre" />
+                        </>
+                    );
+                }
+                else if (selectedSubMenu === 3) { // Actualizar
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Nombre" />
+                            <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Precio Venta " />
+                            <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="Presentación" />
+                            <input type="text" value={inputData[3] || ''} onChange={(e) => handleInputChange(e, 3)} placeholder="Unidad Medida" />
+                            <input type="text" value={inputData[4] || ''} onChange={(e) => handleInputChange(e, 4)} placeholder="Empacado" />
+                            <input type="text" value={inputData[5] || ''} onChange={(e) => handleInputChange(e, 5)} placeholder="Fecha Exp (YYYY-MM-DD)" />
+                            <input type="text" value={inputData[6] || ''} onChange={(e) => handleInputChange(e, 6)} placeholder="ID categoría" />
+                            <input type="text" value={inputData[7] || ''} onChange={(e) => handleInputChange(e, 7)} placeholder="ID producto" />
+                        </>
+                    );
+                }
+                break; 
+            case 5: // RF6 Crear Orden para una sucursal
+                return (
+                    <>
+                        <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Fecha entrega (YYYY-MM-DD)" />
+                        <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Estado: Poner vigente" />
+                        <input type="text" value={inputData[2] || ''} onChange={(e) => handleInputChange(e, 2)} placeholder="ID sucursal envío" />
+                        <input type="text" value={inputData[3] || ''} onChange={(e) => handleInputChange(e, 3)} placeholder="NIT proveedor" />
+            
+                        <div className="product-inputs">
+                            <input type="text" value={productInput.codBarras || ''} onChange={(e) => handleProductInputChange(e, 'codBarras')} placeholder="Producto Código de barras" />
+                            <input type="text" value={productInput.cantidad || ''} onChange={(e) => handleProductInputChange(e, 'cantidad')} placeholder="Producto Cantidad" />
+                            <input type="text" value={productInput.precioBodega || ''} onChange={(e) => handleProductInputChange(e, 'precioBodega')} placeholder="Producto Precio en bodega" />
+                            <button type="button" className="add-product" onClick={handleAddProduct}>Agregar Producto a la lista</button>
+                        </div>
+            
+                        <ul>
+                            {products.map((product, index) => (
+                                <li key={index}>
+                                    {product.codBarras}, {product.cantidad}, {product.precioBodega}
+                                </li>
+                            ))}
+                        </ul>
+            
+                        <button type="button" className="add-product-list" onClick={handleSubmit}>Agregar lista de productos</button>
+                    </>
+                );
+            case 6: // RF7 Leer orden por id
+                return (
+                    <>
+                        <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="ID de la sucursal" />
+                    </>
+                );
+            case 7: // RFC1 Productos que cumplen cierta característica
+                if (selectedSubMenu === 0) { // Sucursal
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="ID Sucursal" />
+                        </>
+                    );
+                }
+                else if (selectedSubMenu === 1) { // Precio
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Precio mínimo" />
+                            <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="Precio máximo" />
+
+                        </>
+                    );
+                }
+                else if (selectedSubMenu === 2) { // Fechas
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="Fecha (YYYY-MM-DD)" />
+                            <input type="text" value={inputData[1] || ''} onChange={(e) => handleInputChange(e, 1)} placeholder="mayor o menor" />
+                        </>
+                    );
+                }
+                else if (selectedSubMenu === 3) { // Categoría
+                    return (
+                        <>
+                            <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="ID categoría" />
+                        </>
+                    );
+                }
+                break; 
+            case 8: // RFC2 Inventario productos en una sucursal
+                return (
+                    <>
+                        <input type="text" value={inputData[0] || ''} onChange={(e) => handleInputChange(e, 0)} placeholder="ID sucursal" />
+                    </>
+                );
+            
+            default:
+                return null;
+        }
+    };
+
+    // Este pone el nombre del submenu arribita del form
+    const getSubMenuName = () => {
+        switch(selectedButton){
+            case 0: // RF1
+                return 'Crear Sucursal';
+            case 1: // RF2
+                if (selectedSubMenu === 0) {
+                    return 'Crear Bodega';
+                } else if (selectedSubMenu === 1) {
+                    return 'Borrar Bodega';
+                }
+                break;
+            case 2: // RF3
+                if (selectedSubMenu === 0) {
+                    return 'Crear proveedor';
+                } else if (selectedSubMenu === 1) {
+                    return 'Actualizar proveedor';
+                }
+                break;
+            case 3: // RF4
+                if (selectedSubMenu === 0) {
+                    return 'Crear categoría';
+                } else if (selectedSubMenu === 1) {
+                    return 'Leer categoría por id';
+                } else if (selectedSubMenu === 2) {
+                    return 'Leer categoría por nombre';
+                }
+                break;
+            case 4: // RF5
+                if (selectedSubMenu === 0) {
+                    return 'Crear producto';
+                } else if (selectedSubMenu === 1) {
+                    return 'Leer producto ID';
+                } else if (selectedSubMenu === 2) {
+                    return 'Leer producto Nombre';
+                } else if (selectedSubMenu === 3) {
+                    return 'Actualizar producto';
+                }
+                break;
+            case 5: // RF6
+                return 'Crear Orden para una sucursal';
+            case 6: // RF7
+                return "Obtener Orden por su id";
+            case 7: // RFC1
+                if (selectedSubMenu === 0) {
+                    return 'Productos por sucursal';
+                } else if (selectedSubMenu === 1) {
+                    return 'Productos por precio';
+                } else if (selectedSubMenu === 2) {
+                    return 'Productos por fecha';
+                } else if (selectedSubMenu === 3) {
+                    return 'Productos por categoría';
+                }
+                break;
+            case 8: // RFC2
+                return "Inventario productos en una sucursal";
+                
+            default:
+                return null;
+        }
+    };
+
+    // Este pone los botones de acceso a los submenus
+    const renderSubMenu = () => {
+        switch (selectedButton) {
+            case 0: // RF1
+                return (
+                    <div className="submenu">
+                        <button onClick={() => handleSubMenuClick(0)}>Crear Sucursal</button>
+                    </div>
+                );
+            case 1: // RF2
+                return (
+                    <div className="submenu">
+                        <button onClick={() => handleSubMenuClick(0)}>Crear Bodega</button>
+                        <button onClick={() => handleSubMenuClick(1)}>Borrar Bodega</button>
+                    </div>
+                );
+            case 2: // RF3
+                return (
+                    <div className="submenu">
+                        <button onClick={() => handleSubMenuClick(0)}>Crear Proveedor</button>
+                        <button onClick={() => handleSubMenuClick(1)}>Actualizar Proveedor</button>
+                    </div>
+                );
+            case 3: // RF4
+                return (
+                    <div className="submenu">
+                        <button onClick={() => handleSubMenuClick(0)}>Crear categoría</button>
+                        <button onClick={() => handleSubMenuClick(1)}>Leer categoría ID</button>
+                        <button onClick={() => handleSubMenuClick(2)}>Leer categoría Nombre</button>
+                    </div>
+                )
+            case 4: // RF5
+                return (
+                    <div className="submenu">
+                        <button onClick={() => handleSubMenuClick(0)}>Crear producto</button>
+                        <button onClick={() => handleSubMenuClick(1)}>Leer producto ID</button>
+                        <button onClick={() => handleSubMenuClick(2)}>Leer producto Nombre</button>
+                        <button onClick={() => handleSubMenuClick(3)}>Actualizar producto</button>
+                    </div>
+                );
+            case 5: // RF6
+                return (
+                    <div className="submenu">
+                        <button onClick={() => handleSubMenuClick(0)}>Crear Orden para una sucursal</button>
+                    </div>
+                );
+            case 6: // RF7
+                return (
+                    <div className="submenu">
+                        <button onClick={() => handleSubMenuClick(0)}>Obtener Orden por su id</button>
+                    </div>
+                );
+            case 7: // RFC1
+                return (
+                    <div className="submenu">
+                        <button onClick={() => handleSubMenuClick(0)}>Productos por sucursal</button>
+                        <button onClick={() => handleSubMenuClick(1)}>Productos por precio</button>
+                        <button onClick={() => handleSubMenuClick(2)}>Productos por fecha</button>
+                        <button onClick={() => handleSubMenuClick(3)}>Productos por categoría</button>
+                    </div>
+                );
+            case 8: // RFC2
+                return (
+                    <div className="submenu">
+                        <button onClick={() => handleSubMenuClick(0)}>Inventario productos en una sucursal</button>
+                    </div>
+                );
+           
+
+            default:
+                return null;
+        }
+    };
+
+    // Este pone el nombre del requerimiento arriba del form
+    const getReqName = () => {
+        if (selectedButton < 7) {
+            return `RF${selectedButton + 1}`;
+        } else {
+            return `RFC${selectedButton - 6}`;
+        }
+    };
+
+
+    // Este es el render final, con el html que muestra todo
+    return (
+        <div className="Reqs">
+            <header>
+                <h1>Requerimientos</h1>
+            </header>
+            <div className="container">
+                <div className="menu">
+                    {[...Array(7)].map((_, index) => (
+                        <button key={index} onClick={() => handleButtonClick(index)}>
+                            RF{index + 1}
+                        </button>
+                    ))}
+                    {[...Array(2)].map((_, index) => (
+                        <button key={index + 7} onClick={() => handleButtonClick(index + 7)}>
+                            RFC{index + 1}
+                        </button>
+                    ))}
+                </div>
+                <div className="panel">
+                    {selectedButton !== null && (
+                        <div>
+                            <h2>{getReqName()}</h2>
+                            {renderSubMenu()}
+                            {selectedSubMenu !== null && (
+                                <>
+                                    <h3>{getSubMenuName()}</h3>
+                                    <form onSubmit={handleFormSubmit}>
+                                        {renderInputs()}
+                                        <button type="submit">Submit</button>
+                                    </form>
+                                    <div className="result">
+                                        <pre>{result}</pre> {} </div>
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Reqs;
+
+
+
+
+/*
+function Reqs() {
     const [selectedButton, setSelectedButton] = useState(null);
     const [selectedSubMenu, setSelectedSubMenu] = useState(null);
     const [inputData, setInputData] = useState({});
@@ -762,7 +1365,7 @@ function Reqs() {
                                         <button type="submit">Submit</button>
                                     </form>
                                     <div className="result">
-                                        <pre>{result}</pre> {/* Mostrar el resultado en un elemento <pre> */}                                    </div>
+                                        <pre>{result}</pre> {} </div>
                                 </>
                             )}
                         </div>
@@ -773,4 +1376,4 @@ function Reqs() {
     );
 }
 
-export default Reqs;
+export default Reqs;*/
