@@ -119,6 +119,9 @@ header h1 {
     font-size: 1em; /* Tamaño de letra más legible */
 }
 
+
+
+
 /* Estilo para el botón de agregar producto */
 button.add-product {
     display: block;
@@ -165,4 +168,102 @@ button.add-product-list:hover {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1em;
+}
+
+
+
+/* Asegurar que los inputs de inventarios tengan la misma distancia */
+.inventarios-inputs input[type="text"] {
+    width: calc(100% - 30px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+/* Estilo para el botón de agregar inventario */
+button.add-inventario {
+    display: block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    margin-bottom: 20px; /* Agrega margen inferior */
+    border: none;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s ease;
+}
+
+button.add-inventario:hover {
+    background-color: #3a78c2; /* Color de fondo al pasar el ratón */
+}
+
+/* Estilo para el botón de agregar lista de inventarios */
+button.add-inventario-list {
+    display: block;
+    padding: 10px 20px;
+    margin-top: 20px; /* Agrega margen superior */
+    border: none;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s ease;
+}
+
+button.add-inventario-list:hover {
+    background-color: #3a78c2; /* Color de fondo al pasar el ratón */
+}
+
+
+
+/* Asegurar que los inputs de inventarios tengan la misma distancia */
+.receps-inputs input[type="text"] {
+    width: calc(100% - 30px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+/* Estilo para el botón de agregar inventario */
+button.add-recep {
+    display: block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    margin-bottom: 20px; /* Agrega margen inferior */
+    border: none;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s ease;
+}
+
+button.add-recep:hover {
+    background-color: #3a78c2; /* Color de fondo al pasar el ratón */
+}
+
+/* Estilo para el botón de agregar lista de inventarios */
+button.add-recep-list {
+    display: block;
+    padding: 10px 20px;
+    margin-top: 20px; /* Agrega margen superior */
+    border: none;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s ease;
+}
+
+button.add-receo-list:hover {
+    background-color: #3a78c2; /* Color de fondo al pasar el ratón */
 }
